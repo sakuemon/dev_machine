@@ -1,0 +1,4 @@
+- hosts : appservers
+  sudo: yes
+  roles:
+    - php

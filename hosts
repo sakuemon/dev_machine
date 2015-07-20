@@ -1,0 +1,10 @@
+[webservers]
+# TODO set ip addres for web servers
+
+[dbservers]
+# TODO set ip addres for db servers
+
+[appservers]
+# TODO set ip addres for app servers
+
+

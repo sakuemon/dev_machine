@@ -1,0 +1,46 @@
+- name: add repositories
+  yum: name={{item}}
+  with_items:
+    - http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+
+- name: replace repo settings
+  replace: dest=/etc/yum.repos.d/{{item}} regexp="enabled *= *1" replace="enabled=0"
+  with_items:
+    - mysql-community-source.repo
+    - mysql-community.repo
+
+- name: install mysql
+  yum: name={{ item }} enablerepo=mysql-connectors-community,mysql-tools-community,mysql56-community state=present
+  with_items:
+    - mysql-server
+    - MySQL-python
+- name: start mysql
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+  sudo: yes
+
+- name: set root password to db
+  mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: set root password to my.cnf
+  template:
+    src: .my.cnf.j2
+    dest: "~/.my.cnf"
+    mode: 0600
+
+- name: create database
+  mysql_db: name={{ mysql_db_name }} state=present
+- name: create database user
+  mysql_user: name=gandrsystem password={{ mysql_db_password }} state=present priv="*.*:ALL"
+
+- name: add mysql to firewall
+  command: firewall-cmd --permanent --add-service=mysql
+- name: reload firewall
+  command: firewall-cmd --reload
+

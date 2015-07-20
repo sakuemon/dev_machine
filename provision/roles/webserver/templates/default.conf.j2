@@ -1,0 +1,27 @@
+server {
+	listen	80;
+	server_name	{{ webserver_name}};
+	root	/home/vagrant/src/public;
+	index index.php index.html;
+
+	access_log	/var/log/nginx/{{ webserver_name }}.log;
+	error_log	/var/log/nginx/{{ webserver_name }}_error.log;
+
+	location / {
+		try_files $uri $uri/ /index.php?$args;
+	}
+
+	location ~ ^/index.php$ {
+		include /etc/nginx/fastcgi_params;
+		fastcgi_pass unix:/var/run/php-fpm.socket;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+	}
+
+	location ~ /\. {
+		deny all;
+		access_log off;
+		log_not_found off;
+	}
+}
+
