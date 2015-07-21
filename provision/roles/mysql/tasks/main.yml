@@ -37,7 +37,7 @@
 - name: create database
   mysql_db: name={{ mysql_db_name }} state=present
 - name: create database user
-  mysql_user: name=gandrsystem password={{ mysql_db_password }} state=present priv="*.*:ALL"
+  mysql_user: name={{ mysql_db_user }} password={{ mysql_db_password }} state=present priv="*.*:ALL"
 
 - name: add mysql to firewall
   command: firewall-cmd --permanent --add-service=mysql
