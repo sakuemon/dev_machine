@@ -26,6 +26,7 @@
     - php-tokenizer
     - php-openssl
     - php-fpm
+    - php-pecl-xdebug
 
 - name: put php-fpm config
   copy: src=www.conf dest=/etc/php-fpm.d/www.conf

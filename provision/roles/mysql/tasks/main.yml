@@ -2,13 +2,13 @@
   yum: name={{item}}
   with_items:
     - http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
-
+# 明示的に指定したいのでenabledは全て0にする
 - name: replace repo settings
   replace: dest=/etc/yum.repos.d/{{item}} regexp="enabled *= *1" replace="enabled=0"
   with_items:
     - mysql-community-source.repo
     - mysql-community.repo
-
+# mysql
 - name: install mysql
   yum: name={{ item }} enablerepo=mysql-connectors-community,mysql-tools-community,mysql56-community state=present
   with_items:
@@ -20,25 +20,29 @@
     state: started
     enabled: yes
   sudo: yes
-
 - name: set root password to db
-  mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
+  mysql_user: name=root host={{ item }} password={{ mysql_root_password }} priv=*.*:ALL,GRANT
   with_items:
     - 127.0.0.1
     - ::1
     - localhost
-
 - name: set root password to my.cnf
   template:
     src: .my.cnf.j2
     dest: "~/.my.cnf"
     mode: 0600
-
 - name: create database
   mysql_db: name={{ mysql_db_name }} state=present
 - name: create database user
-  mysql_user: name={{ mysql_db_user }} password={{ mysql_db_password }} state=present priv="*.*:ALL"
+  mysql_user: name={{ mysql_db_user_name }} login_user=root login_password={{ mysql_root_password }} host={{ item }} password={{ mysql_db_password }} state=present priv=*.*:ALL
+  with_items:
+    - 127.0.0.1
+    - ::1
+    - localhost
+- name: grant other server access to database user
+  mysql_user: name={{ mysql_db_user_name }} login_user=root login_password={{ mysql_root_password }} host=% password={{ mysql_db_password }} state=present priv=*.*:ALL
 
+# firewall
 - name: add mysql to firewall
   command: firewall-cmd --permanent --add-service=mysql
 - name: reload firewall
