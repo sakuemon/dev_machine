@@ -28,6 +28,8 @@
     - php-fpm
     - php-pecl-xdebug
 
+- name: put xdebug setting
+  copy: src=xdebug_section.ini dest/etc/php.d/xdebug_section.ini
 - name: put php-fpm config
   copy: src=www.conf dest=/etc/php-fpm.d/www.conf
 - name: start php-fpm
