@@ -27,7 +27,10 @@
     - php-openssl
     - php-fpm
     - php-pecl-xdebug
+    - php-xml
 
+- name: replace timezone
+  replace: dest='/etc/php.ini' regexp=';date.timezone =' replace='date.timezone = Asia/Tokyo'
 - name: put xdebug setting
   copy: src=xdebug_section.ini dest=/etc/php.d/xdebug_section.ini
 - name: put php-fpm config
