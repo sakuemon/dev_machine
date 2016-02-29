@@ -10,6 +10,7 @@ mysql -u root -p
 alter user 'root'@'localhost' identified by 'NewPassword';
 create user 'user-name' identified by 'Password';
 create database 'db_name';
+```
 
 # php
 ```
