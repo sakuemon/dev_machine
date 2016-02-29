@@ -1,0 +1,35 @@
+- name: add repositories
+  yum: name={{item}}
+  with_items:
+    - epel-release
+    - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+#    - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+#    - https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+
+- name: install php 
+  yum: name={{ item }} enablerepo=remi,remi-php70 state=present
+  with_items:
+    - php70
+    - php70-php-common
+    - php70-php-devel
+    - php70-php-mbstring
+    - php70-php-mcrypt
+    - php70-php-mysqlnd
+    - php70-php-pdo
+    - php70-php-fpm
+    - php70-php-pecl-xdebug
+    - php70-php-xml
+
+- name: replace timezone
+  replace: dest='/etc/opt/remi/php70/php.ini' regexp=';date.timezone =' replace='date.timezone = Asia/Tokyo'
+- name: put xdebug setting
+  copy: src=xdebug_section.ini dest=/etc/opt/remi/php70/php.d/xdebug_section.ini
+- name: put php-fpm config
+  copy: src=www.conf dest=/etc/opt/remi/php70/php-fpm.d/www.conf
+- name: start php-fpm
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes
+  sudo: yes
+
